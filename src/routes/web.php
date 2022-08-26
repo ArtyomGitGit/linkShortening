@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LinkController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    dd ( DB::connection()->getDatabaseName());
-    // return view('welcome');
+    return view('welcome');
 });
+
+Route::get(config('services.part_name_for_short_link') . '/{unique_path}', [LinkController::class, 'redirectToOriginalLink']);
