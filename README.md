@@ -1,4 +1,6 @@
-# REST API для сокращения ссылок 
+# Сервис для сокращения ссылок
+В стиле REST API и GraphQL.
+Для REST имеется документация на Swagger (/api/documentation).
 Базируется на Laravel 9.
 
 ## Развёртывание
@@ -12,10 +14,10 @@
     - php artisan migrate
 
 ---
-## Описание API
+## Документация REST API
 Домен указан в src/.env в переменной APP_URL
 
-**POST /api/shorten/link** - запрос для создания короткой ссылки. Запрос принимает стороку (ссылку) и возвращает сокращенную ссылку.
+**POST /api/shorten/link** - запрос для создания короткой ссылки. Запрос принимает стороку (ссылку) и возвращает модель сокращенной ссылки.
 ```
 Content-Type: application/json
 ```
@@ -32,7 +34,13 @@ JSON нагрузка:
 Content-Type: application/json
 
 ```
-"Сформированная короткая ссылка" (string)
+    {
+        "id": id (int),
+        "original": "первоначальная ссылка" (string),
+        "shortened": "сокращённая ссылка" (string),
+        "updated_at": "время обновления в виде 2022-08-28T19:37:26.000000Z" (string),
+        "created_at": "время создания в виде 2022-08-28T19:37:26.000000Z" (string),
+    }
 ```
 
 ---
@@ -48,4 +56,56 @@ Content-Type: application/json
         "click_count": счетчик переходов по короткой ссылке (int)
     }
 ]
+```
+
+---
+## Документация GraphQL
+
+Точка входа - /graphql
+
+---
+Queries
+
+```
+{
+    links {
+        id,
+        original,
+        shortened,
+        click_count,
+        created_at,
+        updated_at
+    }
+}
+```
+
+```
+{
+    link(id: <id>) {
+        id,
+        original,
+        shortened,
+        click_count,
+        created_at,
+        updated_at
+    }
+}
+```
+
+---
+Mutation
+
+```
+mutation {
+  shortenLink(
+    original: <"ссылка для сокращения">
+  ) {
+        id,
+        original,
+        shortened,
+        click_count,
+        created_at,
+        updated_at
+  }
+}
 ```
