@@ -12,6 +12,45 @@ use Illuminate\Support\Facades\Validator;
 
 class LinkController extends Controller
 {
+    /**
+     * @OA\Post(
+     *      path="/shorten/link",
+     *      operationId="shortenLink",
+     *      tags={"Endpoints"},
+     *      summary="Запрос для создания короткой ссылки",
+     *      @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="link",
+     *                     type="string"
+     *                 ),
+     *                 example={"link": "https://google.com"}
+     *             )
+     *         )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *                  @OA\Property(property="id", type="int64", example=1),
+     *                  @OA\Property(property="original", type="string", example="https://google.com"),
+     *                  @OA\Property(property="shortened", type="string", example="http://localhost/shortenedlink/1"),
+     *                  @OA\Property(property="updated_at", type="string", example="2022-08-28T19:37:26.000000Z"),
+     *                  @OA\Property(property="created_at", type="string", example="2022-08-28T19:37:26.000000Z"),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal server error",
+     *      )
+     * )
+     */
     public function shortenLink(Request $request)
     {
         // Валидация
@@ -25,7 +64,7 @@ class LinkController extends Controller
         $validated = $validator->validated();
         try {
             $shortenedLink = (new LinkService)->makeShortenedLink();
-            Link::create([
+            $linkModel = Link::create([
                 'original' => $validated['link'],
                 'shortened' => $shortenedLink
             ]);
@@ -36,9 +75,30 @@ class LinkController extends Controller
             Log::error("Укорачивание ссылки: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json($e->getMessage(), 500);
         }
-        return response()->json($shortenedLink);
+        return response()->json($linkModel);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/shorten/links",
+     *      operationId="getShortenLinksList",
+     *      tags={"Endpoints"},
+     *      summary="Получить список ранее сокращенных ссылок",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="original", type="string", example="https://google.com"),
+     *                     @OA\Property(property="shortened", type="string", example="http://localhost/shortenedlink/1"),
+     *                     @OA\Property(property="click_count", type="int", example=1),
+     *                 )
+     *          )
+     *     )
+     * )
+     */
     public function getShortenLinksList()
     {
         $linksList = Cache::remember('all_links_list', now()->addMonth(), function () {
@@ -61,5 +121,4 @@ class LinkController extends Controller
         }
         return redirect($originalLinkRecord->original);
     }
-
 }

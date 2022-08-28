@@ -1,0 +1,124 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Документация API по сокращению ссылок",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8883/api",
+            "description": "Default API Server"
+        }
+    ],
+    "paths": {
+        "/shorten/link": {
+            "post": {
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Запрос для создания короткой ссылки",
+                "operationId": "shortenLink",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "link": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object",
+                                "example": {
+                                    "link": "https://google.com"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "int64",
+                                            "example": 1
+                                        },
+                                        "original": {
+                                            "type": "string",
+                                            "example": "https://google.com"
+                                        },
+                                        "shortened": {
+                                            "type": "string",
+                                            "example": "http://localhost/shortenedlink/1"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "example": "2022-08-28T19:37:26.000000Z"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "example": "2022-08-28T19:37:26.000000Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/shorten/links": {
+            "get": {
+                "tags": [
+                    "Endpoints"
+                ],
+                "summary": "Получить список ранее сокращенных ссылок",
+                "operationId": "getShortenLinksList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "original": {
+                                                "type": "string",
+                                                "example": "https://google.com"
+                                            },
+                                            "shortened": {
+                                                "type": "string",
+                                                "example": "http://localhost/shortenedlink/1"
+                                            },
+                                            "click_count": {
+                                                "type": "integer",
+                                                "example": 1
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Endpoints"
+        }
+    ]
+}
