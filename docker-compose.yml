@@ -20,34 +20,39 @@ services:
       - php
       - redis
       - db
-      - phpmyadmin
+      - pgadmin
     networks:
       - laravel
 
   db:
-    image: mysql:8.0.19
+    image: postgres
     container_name: db
     restart: unless-stopped
     ports:
-      - ${DB_LOCAL_PORT}:3306
+      - ${DB_LOCAL_PORT}:5432
     volumes:
-      - ./dockerfiles/mysql/volume:/var/lib/mysql
+      - ./dockerfiles/pgsql/volume:/var/lib/pgsql
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /data/postgres
     networks:
       - laravel
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:5.0.2
-    container_name: phpmyadmin
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
     environment:
-      PMA_HOST: db
-    restart: always
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - ./dockerfiles/pgadmin:/var/lib/pgadmin
     ports:
-      - ${PMA_LOCAL_PORT}:80
+      - ${PGA_LOCAL_PORT}:80
     networks:
       - laravel
+    restart: unless-stopped
     depends_on:
       - db
 
