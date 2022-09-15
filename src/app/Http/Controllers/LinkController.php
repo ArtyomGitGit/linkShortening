@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateShortenLinkRequest;
 use App\Http\Resources\LinkResource;
 use Exception;
 use App\Models\Link;
@@ -52,17 +53,9 @@ class LinkController extends Controller
      *      )
      * )
      */
-    public function shortenLink(Request $request)
+    public function shortenLink(CreateShortenLinkRequest $request)
     {
-        // Валидация
-        $validator = Validator::make($request->all(), [
-            'link' => 'required|url|unique:links,original|max:380',
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors()->all(), 400);
-        }
-
-        $validated = $validator->validated();
+        $validated = $request->validated();
         try {
             $shortenedLink = (new LinkService)->makeShortenedLink();
             $linkModel = Link::create([
