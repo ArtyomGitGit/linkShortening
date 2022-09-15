@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\LinkResource;
 use Exception;
 use App\Models\Link;
 use Illuminate\Http\Request;
@@ -75,7 +76,7 @@ class LinkController extends Controller
             Log::error("Укорачивание ссылки: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             return response()->json($e->getMessage(), 500);
         }
-        return response()->json($linkModel);
+        return new LinkResource($linkModel);
     }
 
     /**
@@ -102,7 +103,7 @@ class LinkController extends Controller
     public function getShortenLinksList()
     {
         $linksList = Cache::remember('all_links_list', now()->addMonth(), function () {
-            return Link::select('original', 'shortened', 'click_count')->get();
+            return LinkResource::collection(Link::all());
         });
         return response()->json($linksList);
     }
